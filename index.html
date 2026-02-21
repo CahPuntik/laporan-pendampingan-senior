@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Form Laporan Senior - Web App untuk pencatatan data pendampingan senior">
+  <meta name="theme-color" content="#2e687b">
+  <meta name="color-scheme" content="light dark">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <title>Laporan Pendampingan Senior</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(
+      to bottom,
+      #2e687bff,
+      #00384d,
+      #002b3d);
+    }
+    .container {
+      max-width: 400px;
+      margin: 10px auto;
+      background: rgba(255, 255, 255, 0.4);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .operator-card {
+      position: relative;
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      padding: 25px 15px 15px 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: white;
+    }
+    
+    .operator-number {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      background: white;
+      color: #ff0000;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    
+    .operator-card input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    
+    .removeBtn {
+      background: #ffffff;
+      color: #ff0000;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    
+    h3 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Tombol Biru */
+    .btn-blue {
+      background: #007bff;
+    }
+    button.btn-blue:hover {
+      background: #0056b3;
+    }
+    
+    /* Tombol Kuning */
+    .btn-yellow {
+      background-color: #ffc107;
+      color: #000;
+    }
+    button.btn-yellow:hover {
+      background-color: #e0a800;
+    }
+    .hidden {
+      display: none;
+    }
+    
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .modal-header h4 {
+      margin: 0;
+      font-size: 18px;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-close:hover {
+      color: #dc3545;
+    }
+    
+    #editList {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    
+    /* App Bar */
+    .app-bar {
+      background: linear-gradient(to right, #2e687b, #1a3d4d);
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .app-bar h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .app-bar-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    
+
+  </style>
+</head>
+<body>
+  <!-- App Bar -->
+  <div class="app-bar">
+    <div>
+      <h1>Laporan Pendampingan Senior</h1>
+    </div>
+    <div class="app-bar-right">
+    </div>
+  </div>
+
+  <div class="container">
+
+    <form id="inputForm">
+
+      <div id="operatorContainer">
+    
+      <div class="operator-card">
+      <div class="operator-number">1</div>
+        <label>Nama</label>
+        <input type="text" name="nama[]" required placeholder="Masukan Nama Lengkap...">
+    
+        <label>NRP</label>
+        <input type="text" name="nrp[]" required placeholder="Masukan NRP...">
+    
+        <label>C/N Unit</label>
+        <input type="text" name="cnUnit[]" required placeholder="Masukan Kode Unit">
+        
+        <button type="button" class="removeBtn hidden">Hapus</button>
+      </div>
+    
+    </div>
+    
+    <button type="button" id="addOperator" class="btn-yellow">+ Tambah Operator</button>
+      
+      <label for="namaInstruktur">Nama Instruktur</label>
+      <select id="namaInstruktur" name="namaInstruktur" required>
+        <option value="" disabled selected hidden>-- Pilih Instruktur --</option>
+        <option value="Adlin Zaid Ismail">Adlin Zaid Ismail</option>
+        <option value="Asep Cahyadi">Asep Cahyadi</option>
+        <option value="Ananto Ninggar Sejati">Ananto Ninggar Sejati</option>
+        <option value="Anton Sersandi Wahyu">Anton Sersandi Wahyu</option>
+        <option value="Budiman">Budiman</option>
+        <option value="Herry Kiswanto Kanoneng">Herry Kiswanto Kanoneng</option>
+        <option value="Khumaidi Noval">Khumaidi Noval</option>
+        <option value="Mohamad Khoirul Umam">Mohamad Khoirul Umam</option>
+        <option value="Muhammad Abdianoor">Muhammad Abdianoor</option>
+        <option value="Muhammad Syaukani">Muhammad Syaukani</option>
+        <option value="Naryono">Naryono</option>
+        <option value="Ryan Pamungkas">Ryan Pamungkas</option>
+        <option value="Slamet Herianto">Slamet Herianto</option>
+        <option value="Teguh Arifiatna">Teguh Arifiatna</option>
+        <option value="Wahyudi">Wahyudi</option>
+        
+      </select>
+    
+      <label for="tanggal">Tanggal</label>
+      <input type="date" id="tanggal" name="tanggal" required>
+      
+      <label for="lokasi">Lokasi</label>
+      <input type="text" id="lokasi" name="lokasi" required placeholder="Lokasi Praktek">
+      
+      <label for="shift">Shift</label>
+      <select id="shift" name="shift" required>
+        <option value="" disabled selected hidden>-- Pilih Shift --</option>
+        <option value="Shift 1">Shift 1</option>
+        <option value="Shift 2">Shift 2</option>
+      </select>
+      
+      <label for="keterangan">Keterangan</label>
+      <input type="text" id="Keterangan" name="keterangan" placeholder="Keterangan Tambahan">
+      
+      <button type="submit" class="btn-blue">Kirim</button>
+    </form>
+  </div>
+
+
+
+<script>
+  
+/* ================== GLOBAL ================== */
+const form = document.getElementById('inputForm');
+const submitBtn = document.querySelector('.btn-blue');
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzP4F2bjyO295Xekw7SttE9mrDGvQ1tnhJWKgdayP3sE0_kdVfjX1v4tVHhXGEWoLyEuA/exec";
+
+/* ================== SUBMIT ================== */
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Mengirim...';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert('Data berhasil disimpan');
+    form.reset();
+    submitBtn.textContent = 'Kirim';
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Gagal mengirim data');
+  })
+  .finally(() => {
+    submitBtn.disabled = false;
+  });
+});
+
+
+
+/* ================== TAMBAH OPERATOR ================== */
+    
+    const operatorContainer = document.getElementById('operatorContainer');
+    const addOperatorBtn = document.getElementById('addOperator');
+    
+    function updateOperatorNumber() {
+      const cards = document.querySelectorAll('.operator-card');
+      cards.forEach((card, index) => {
+        card.querySelector('.operator-number').textContent = index + 1;
+      });
+    }
+    
+    function createOperatorCard() {
+      const div = document.createElement('div');
+      div.classList.add('operator-card');
+    
+      div.innerHTML = `
+        <div class="operator-number"></div>
+    
+        <label>Nama</label>
+        <input type="text" name="nama[]" required placeholder="Masukan Nama Lengkap...">
+    
+        <label>NRP</label>
+        <input type="text" name="nrp[]" required placeholder="Masukan NRP...">
+    
+        <label>C/N Unit</label>
+        <input type="text" name="cnUnit[]" required placeholder="Masukan Kode Unit">
+    
+        <button type="button" class="removeBtn">Hapus</button>
+      `;
+    
+      operatorContainer.appendChild(div);
+      updateOperatorNumber();
+    }
+    
+    addOperatorBtn.addEventListener('click', createOperatorCard);
+    
+    operatorContainer.addEventListener('click', function(e) {
+      if (e.target.classList.contains('removeBtn')) {
+        e.target.closest('.operator-card').remove();
+        updateOperatorNumber();
+      }
+    });
+
+    function tambahOperator() {
+      operatorCount++;
+    
+      const container = document.getElementById("operatorContainer");
+    
+      const div = document.createElement("div");
+      div.classList.add("operator-card");
+    
+      div.innerHTML = `
+        <div class="operator-number">${operatorCount}</div>
+    
+        <label>Nama</label>
+        <input type="text" name="nama_operator[]" required>
+    
+        <label>NRP</label>
+        <input type="text" name="nrp_operator[]" required>
+    
+        <label>CN Unit</label>
+        <input type="text" name="cn_unit[]" required>
+      `;
+    
+      container.appendChild(div);
+    }
+</script>
+
+</body>
+</html>
