@@ -6,11 +6,7 @@
   <meta name="description" content="Form Laporan Senior - Web App untuk pencatatan data pendampingan senior">
   <meta name="theme-color" content="#2e687b">
   <meta name="color-scheme" content="light dark">
-  
-  <!-- Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
+
   
   <title>Laporan Pendampingan Senior</title>
   <style>
@@ -64,7 +60,7 @@
       background: #ffffff;
       color: #ff0000;
       font-weight: bold;
-      margin-top: 5px;
+      margin-top: 15px;
     }
     
     h3 {
@@ -224,11 +220,11 @@
     
       <div class="operator-card">
       <div class="operator-number">1</div>
-        <label>Nama</label>
-        <input type="text" name="nama[]" required placeholder="Masukan Nama Lengkap...">
-    
         <label>NRP</label>
         <input type="text" name="nrp[]" required placeholder="Masukan NRP...">
+
+        <label>Nama</label>
+        <input type="text" name="nama[]" required placeholder="Masukan Nama Lengkap...">
     
         <label>C/N Unit</label>
         <input type="text" name="cnUnit[]" required placeholder="Masukan Kode Unit">
@@ -256,6 +252,7 @@
         <option value="Naryono">Naryono</option>
         <option value="Ryan Pamungkas">Ryan Pamungkas</option>
         <option value="Slamet Herianto">Slamet Herianto</option>
+        <option value="Solihin Rosadi">Solihin Rosadi</option>
         <option value="Teguh Arifiatna">Teguh Arifiatna</option>
         <option value="Wahyudi">Wahyudi</option>
         
@@ -294,7 +291,24 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbzP4F2bjyO295Xekw7SttE9
 form.addEventListener('submit', function (e) {
   e.preventDefault();
 
-  const formData = new FormData(form);
+  // konstruk ulang FormData guna menjaga urutan Nama, NRP, CN Unit
+  const formData = new FormData();
+  const cards = document.querySelectorAll('.operator-card');
+  cards.forEach(card => {
+    const namaVal = card.querySelector('input[name="nama[]"]').value;
+    const nrpVal = card.querySelector('input[name="nrp[]"]').value;
+    const cnVal = card.querySelector('input[name="cnUnit[]"]').value;
+    formData.append('nama[]', namaVal);
+    formData.append('nrp[]', nrpVal);
+    formData.append('cnUnit[]', cnVal);
+  });
+  // tambahkan field lain dari formulir
+  const extra = new FormData(form);
+  for (const [key, val] of extra) {
+    if (!['nama[]','nrp[]','cnUnit[]'].includes(key)) {
+      formData.append(key, val);
+    }
+  }
 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Mengirim...';
@@ -325,6 +339,78 @@ form.addEventListener('submit', function (e) {
     const operatorContainer = document.getElementById('operatorContainer');
     const addOperatorBtn = document.getElementById('addOperator');
     
+    // peta NRP ke nama untuk pengisian otomatis
+    const nrpToName = {
+      '0216120': 'ADHYTIA FITRIANTO',
+      '0216124': 'AGUNG SETIA BUDI',
+      '02121296': 'AGUNG SUBAGIYO',
+      '02121253': 'AGUNG TRISNO WIBOWO',
+      '80005737': 'ALFA MUHAMMAD AL QODR',
+      '80003264': 'ALI GHUFRON',
+      '0217363': 'ANTON PRASETYO ADHI',
+      '0212874': 'BAMBANG FERONIKA',
+      '80007179': 'CHRISMON ERICK',
+      '02111807': 'EDI SUSILO',
+      '80000752': 'ERLIDO',
+      '80005151': 'ERWAN',
+      '80001761': 'FERRY BUDY R',
+      '80007165': 'HARTONO',
+      '0217295': 'INSAN DERMAWAN',
+      '0214142': 'IWAN SAPUANTO',
+      '0217250': 'M. HENDRIYANI',
+      '80003620': 'M. NAUVA',
+      '80004241': 'M. REZA ERLANGGA',
+      '80001409': 'MUHAMMAD AISNA',
+      '0216352': 'MUHAMMAD AKHYAR',
+      '0216355': 'MUHAMMAD FADLOLI',
+      '80003837': 'MUHAMMAD IHSAN',
+      '02121442': 'MUHAMMAD ISMAIL',
+      '0217155': 'MUHAMMAD JAMALUDDIN',
+      '0211850': 'MULYANA',
+      '0213129': 'NARA FIRMAN ABIYASA T',
+      '0212013': 'NASICHUDIN',
+      '02121072': 'OFIR IMONG',
+      '0218049': 'RAHMINAL HUDA',
+      '80004463': 'SIRAJUDDIN',
+      '80001726': 'RIZKI CAHYADHI',
+      '80002494': 'TESA NUR R',
+      '0218100': 'FERRY JAYA R',
+      '0208274': 'HADI SUPRAYITNO',
+      '0216359': 'M.IRFAN',
+      '0217291': 'A. ZAKI YAMANI',
+      '02121437': 'TATOK BUDIANTO',
+      '02111666': 'IMAN SINAGA',
+      '0209085': 'SAHRUDIN',
+      '80005067': 'DONI',
+      '0216423': 'RUDI WINARNO',
+      '0217062': 'ARIN SUDANA',
+      '80003687': 'TRIYANTO',
+      '0213103': 'WAHYU WIDODO',
+      '0210717': 'M.NASIR',
+      '02121437': 'TATOK BUDIANTO',
+      '0216175': 'ARPANI',
+      '02111124': 'SULISTIO DARMAWAN',
+      '80005744': 'EBIT SON RADA',
+      '80007107': 'PAHRIJANI',
+      '80006313': 'M RHENAL ABDI SURYA',
+      '02121084': 'HAMZAH SEPTIAN',
+      '80002441': 'DEDIK SURYA K'
+    };
+
+    // jika NRP diisi di salah satu kartu operator, otomatis set nama
+    operatorContainer.addEventListener('input', function(e) {
+      const target = e.target;
+      if (target.name === 'nrp[]' || target.name === 'nrp_operator[]') {
+        const nrp = target.value.trim();
+        const card = target.closest('.operator-card');
+        if (!card) return;
+        const nameInput = card.querySelector('input[name="nama[]"], input[name="nama_operator[]"]');
+        if (nrpToName[nrp] && nameInput) {
+          nameInput.value = nrpToName[nrp];
+        }
+      }
+    });
+    
     function updateOperatorNumber() {
       const cards = document.querySelectorAll('.operator-card');
       cards.forEach((card, index) => {
@@ -339,12 +425,12 @@ form.addEventListener('submit', function (e) {
       div.innerHTML = `
         <div class="operator-number"></div>
     
-        <label>Nama</label>
-        <input type="text" name="nama[]" required placeholder="Masukan Nama Lengkap...">
-    
         <label>NRP</label>
         <input type="text" name="nrp[]" required placeholder="Masukan NRP...">
-    
+
+        <label>Nama</label>
+        <input type="text" name="nama[]" required placeholder="Masukan Nama Lengkap...">
+
         <label>C/N Unit</label>
         <input type="text" name="cnUnit[]" required placeholder="Masukan Kode Unit">
     
@@ -359,7 +445,13 @@ form.addEventListener('submit', function (e) {
     
     operatorContainer.addEventListener('click', function(e) {
       if (e.target.classList.contains('removeBtn')) {
-        e.target.closest('.operator-card').remove();
+        const card = e.target.closest('.operator-card');
+        const num = card ? card.querySelector('.operator-number').textContent : '';
+        if (num) {
+          const ok = confirm('Hapus Kartu Ke-' + num + '?');
+          if (!ok) return; // batal jika tidak setuju
+        }
+        card.remove();
         updateOperatorNumber();
       }
     });
@@ -375,11 +467,11 @@ form.addEventListener('submit', function (e) {
       div.innerHTML = `
         <div class="operator-number">${operatorCount}</div>
     
-        <label>Nama</label>
-        <input type="text" name="nama_operator[]" required>
-    
         <label>NRP</label>
         <input type="text" name="nrp_operator[]" required>
+    
+        <label>Nama</label>
+        <input type="text" name="nama_operator[]" required>
     
         <label>CN Unit</label>
         <input type="text" name="cn_unit[]" required>
